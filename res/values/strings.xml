@@ -19,6 +19,7 @@
     <string name="menu_copy">Copy</string>
     <string name="menu_paste">Paste</string>
     <string name="menu_invert">Invert colors</string>
+    <string name="menu_info">Info</string>
     
     <!-- Android built-in yes/no is Ok/Cancel so add our own. -->
     <string name="yes">Yes</string>

@@ -1,12 +1,5 @@
 package com.landenlabs.encrypnotes;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.sql.Date;
-import java.text.DateFormat;
-
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -17,26 +10,28 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.ContextThemeWrapper;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupMenu;
-import android.widget.Toast;
 
 import com.landenlabs.encrypnotes.ui.RenameDialog;
-import com.landenlabs.encrypnotes.ui.SliderDialog;
 import com.landenlabs.encrypnotes.ui.UiUtil;
 import com.landenlabs.encrypnotes.ui.WebDialog;
 import com.landenlabs.encrypnotes.ui.YesNoDialog;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.sql.Date;
+import java.text.DateFormat;
 
 /**
  * Abstract base class for Load and Save Document file UI.
@@ -52,8 +47,8 @@ public class DocFileDlg {
     private static final String DOC_DIR = "documents/encrypnotes";
     private static final String DOC_EXT = ".etxt";
     private static final DateFormat m_dateFormat = DateFormat.getDateInstance();
-    
-    private final File m_storageDir = new File(Environment.getExternalStorageDirectory(), DOC_DIR);
+    private static final File STORAGE_DIR = new File(Environment.getExternalStorageDirectory(), DOC_DIR);
+
     private Doc.DocMetadata m_docMetadata = new Doc.DocMetadata();
     
     // Passed parameters
@@ -84,14 +79,14 @@ public class DocFileDlg {
      * @return
      */
     public boolean ensureDocDir() {
-        return (m_storageDir.isDirectory() || m_storageDir.mkdir());
+        return (STORAGE_DIR.isDirectory() || STORAGE_DIR.mkdir());
     }
 
     /**
      * @return storage directory.
      */
-    public final File getDir() {
-        return m_storageDir;
+    public static final File getDir() {
+        return STORAGE_DIR;
     }
     
     /**
@@ -159,7 +154,16 @@ public class DocFileDlg {
         m_docMetadata = (Doc.DocMetadata) b.getSerializable("metadata");
         UiUtil.setText(docText, b.getString("text"));       // TODO - decrypt
     }
-    
+
+    public void showInfo() {
+        String infosStr = Doc.getInfoStr(m_docMetadata, m_dateFormat);
+        // YesNoDialog.showDialog(m_context, "Info", infosStr,
+        //         R.id.file_info, YesNoDialog.BTN_OK);
+        String htmlStr = infosStr.replaceAll("\n([^:]*:)(.*)", "<tr><td><span style='color:blue;'>$1</span><td>$2");
+        WebDialog.show(m_context, /* WebDialog.HTML_CENTER_BOX, */
+                String.format("<center><h2>Info</h2></center><p><table>%s</table>", htmlStr));
+    }
+
     // -------------------------------------------------------------------------------------------
     //                                     L O A D     S e c t i o n
     // -------------------------------------------------------------------------------------------
@@ -171,7 +175,7 @@ public class DocFileDlg {
      * On completion send message Okay or Fail.
      */
     public void showLoad(final EncrypPrefs prefs, final EditText docText, final SendMsg sendMsg) {
-        File[] file_list = m_storageDir.listFiles(new FilenameFilter() {
+        File[] file_list = STORAGE_DIR.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String fname) {
                 return fname.endsWith(DOC_EXT);
             }
@@ -189,7 +193,7 @@ public class DocFileDlg {
         AlertDialog.Builder builder = new AlertDialog.Builder( 
                 new ContextThemeWrapper(m_context, R.style.FileListDialogStyle));
         builder.setTitle(m_context.getResources().getString(R.string.list_etxt_files, DOC_EXT, DOC_DIR));
-        final FileListAdapter fileListAdapter = new FileListAdapter(m_context, m_storageDir, DOC_EXT,
+        final FileListAdapter fileListAdapter = new FileListAdapter(m_context, STORAGE_DIR, DOC_EXT,
                 m_dateFormat, m_context.getWindow().getDecorView().getHeight());
 
         fileListAdapter.addAll(file_names);
@@ -225,14 +229,15 @@ public class DocFileDlg {
                         switch (item.getItemId()) {
                             case R.id.file_delete:
                                 YesNoDialog.showDialog(m_context, "Delete ?",
-                                        String.format("Name:     %s\nModified: %s\nLength:    %d",
+                                        String.format("Name:     %s\nModified: %s\nLength:    %,d",
                                                 filename, fileListAdapter.getDateStr(file), file.length()),
                                         R.id.file_delete, YesNoDialog.BTN_YES_NO).setValue(filename).setViewer(fileListAdapter);
                                 break;
                             case R.id.file_info:
                                 YesNoDialog.showDialog(m_context, "Info",
-                                        String.format("Name:     %s\nModified: %s\nLength:    %d",
-                                                filename, fileListAdapter.getDateStr(file), file.length()),
+                                        String.format("Name:     %s\nModified: %s\nLength:    %,d\n",
+                                                filename, fileListAdapter.getDateStr(file), file.length()) +
+                                                fileListAdapter.getInfoStr(file),
                                         R.id.file_info, YesNoDialog.BTN_OK).setValue(filename).setViewer(fileListAdapter);
                                 break;
                             case R.id.file_rename:
@@ -364,9 +369,9 @@ public class DocFileDlg {
                             }
                         });
 
-                m_fileOpenDialog.DefaultFileName = new File(m_storageDir, fname).getPath();
+                m_fileOpenDialog.DefaultFileName = new File(STORAGE_DIR, fname).getPath();
                 m_fileOpenDialog.FilePattern = ".+\\" + DOC_EXT;
-                m_fileOpenDialog.choose(m_storageDir.getPath());
+                m_fileOpenDialog.choose(STORAGE_DIR.getPath());
                 setHint(fname);
             }
         });
@@ -377,7 +382,7 @@ public class DocFileDlg {
                 EditText pwdText = (EditText) dlg.findViewById(R.id.pwd);
                 String pwd = pwdText.getText().toString();
                 String filename = filenameETxt.getText().toString().trim();
-                File file = new File(m_storageDir, filename + DOC_EXT);
+                File file = new File(STORAGE_DIR, filename + DOC_EXT);
                 Date lastModified = Util.getCurrentDate();
                 if (file.exists())
                     lastModified = new Date(file.lastModified());
@@ -429,7 +434,7 @@ public class DocFileDlg {
     private void loadFile(final String fname, String pwd, final EditText docText, final SendMsg sendMsg) 
             throws IOException, Doc.DocException {
         Doc doc = new Doc();
-        doc.doOpen(new File(m_storageDir, fname + DOC_EXT), pwd);
+        doc.doOpen(new File(STORAGE_DIR, fname + DOC_EXT), pwd);
 
         Doc.DocMetadata docMetadata = doc.getDocMetadata();
         docMetadata.copyTo(m_docMetadata);
@@ -454,7 +459,7 @@ public class DocFileDlg {
     String getHint(final String filename) {
         Doc doc = new Doc();
         try {
-            doc.doOpen(new File(m_storageDir, filename + DOC_EXT), null);
+            doc.doOpen(new File(STORAGE_DIR, filename + DOC_EXT), null);
         } catch (Exception ex) {
             return "";
         }
@@ -511,11 +516,11 @@ public class DocFileDlg {
                     filename = "new" + DOC_EXT;
 
                 filenameETxt.setText(filename.replaceAll(".*/", "").replace(DOC_EXT, ""));
-                m_fileOpenDialog.DefaultFileName = new File(m_storageDir, filename).getPath(); // "*"
+                m_fileOpenDialog.DefaultFileName = new File(STORAGE_DIR, filename).getPath(); // "*"
                                                                                                // +
                                                                                                // DOC_EXT;
                 m_fileOpenDialog.FilePattern = ".+\\" + DOC_EXT;
-                m_fileOpenDialog.choose(m_storageDir.getPath());
+                m_fileOpenDialog.choose(STORAGE_DIR.getPath());
             }
         });
 
@@ -582,8 +587,8 @@ public class DocFileDlg {
      */
     public boolean saveFile(String filename, String pwd, String hint, EditText docText, final SendMsg sendMsg) {
 
-        if (!m_storageDir.canWrite()) {
-            YesNoDialog.showOk(m_context, "Apparently I cannot write to " + m_storageDir.getAbsolutePath());
+        if (!STORAGE_DIR.canWrite()) {
+            YesNoDialog.showOk(m_context, "Apparently I cannot write to " + STORAGE_DIR.getAbsolutePath());
             sendMsg.send(SendMsg.MSG_FAIL);
             return false;
         }
@@ -593,14 +598,19 @@ public class DocFileDlg {
     //    if (hint != null)
     //        m_docMetadata.hint = hint;
 
+        // Use new filename if provided
         if (filename == null)
             filename = m_docMetadata.filename;
         else
             m_docMetadata.filename = filename;
 
+        // Use new password if provided
+        if (!TextUtils.isEmpty(pwd))
+            m_docMetadata.setKey(pwd);
+
         Doc doc = new Doc(docText.getText().toString(), m_docMetadata);
-        m_docMetadata.setKey(pwd);
-        File saveToFile = new File(m_storageDir, filename);
+
+        File saveToFile = new File(STORAGE_DIR, filename);
 
         if (saveToFile.exists())
             saveToFile.delete();

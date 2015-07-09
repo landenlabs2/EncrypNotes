@@ -1,28 +1,18 @@
 package com.landenlabs.encrypnotes;
 
-import java.io.File;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-
-import android.app.Activity;
 import android.content.Context;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.landenlabs.encrypnotes.ui.UiUtil;
-import com.landenlabs.encrypnotes.ui.YesNoDialog;
+
+import java.io.File;
+import java.text.DateFormat;
+import java.util.ArrayList;
 
 /**
  * Support 'data model' adapter used with Dialog class to 
@@ -113,6 +103,24 @@ public class FileListAdapter extends ArrayAdapter<String> implements View.OnClic
 
     public String getDateStr(final File file) {
         return m_dateFormat.format(file.lastModified());
+    }
+
+    public String getInfoStr(final File file) {
+        StringBuilder sb = new StringBuilder();
+
+        Doc doc = new Doc();
+        try {
+            doc.doOpen(file, null);
+            sb.append("\nVersion: ").append(doc.getVersion());
+            sb.append("\nHint: ").append(doc.getHint());
+
+            // Doc Meta not available unless you have password.
+            // Doc.DocMetadata docMetaData = doc.getDocMetadata();
+            // sb.append(Doc.getInfoStr(docMetaData, m_dateFormat));
+        } catch (Exception ex) {
+        }
+
+        return sb.toString();
     }
 
     public void sort() {

@@ -112,8 +112,15 @@ class UiPasswordManager implements OnFocusChangeListener {
         return pwdText;
     }
 
+    /***
+     * Return true if valid password entered.
+     *    Return true if Show Pattern or Password enabled
+     *    else return true if both passwords entered match.
+     *
+     * @return true if valid.
+     */
     public boolean isValid() {
-        return m_prefs.ShowPwd ? true : pwdVerify.getText().toString()
+        return (m_prefs.ShowPwd || m_prefs.ShowPat) ? true : pwdVerify.getText().toString()
                 .equals(pwdText.getText().toString());
     }
 

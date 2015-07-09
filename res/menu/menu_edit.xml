@@ -26,6 +26,11 @@
                 android:id="@+id/menu_clear"
                 android:icon="@drawable/ic_menu_cut"
                 android:title="@string/menu_clear"/>
+
+            <item
+                android:id="@+id/menu_info"
+                android:icon="@drawable/ic_menu_info_details"
+                android:title="@string/menu_info"/>
            
         </menu>
     </item>

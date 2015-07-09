@@ -7,8 +7,6 @@ import android.app.FragmentTransaction;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -20,10 +18,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.ActionMode;
-import android.view.ContextMenu;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,12 +26,10 @@ import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import com.landenlabs.encrypnotes.ui.DlgClickListener;
 import com.landenlabs.encrypnotes.ui.LogIt;
@@ -331,6 +324,10 @@ public class EncrypNotes extends Activity implements DlgClickListener, OnSeekBar
 
                 return true;
             }
+
+        case R.id.menu_info:
+            m_docFileDialog.showInfo();
+            break;
         }
         return false;
     }

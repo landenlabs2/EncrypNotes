@@ -4,6 +4,7 @@ package com.landenlabs.encrypnotes;/*
  */
 
 import android.annotation.SuppressLint;
+import android.text.TextUtils;
 
 import com.landenlabs.encrypnotes.ui.LogIt;
 
@@ -22,6 +23,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -95,7 +97,7 @@ public class Doc {
         }
     }
 
-    private static class SaveMetadata implements Serializable {
+    public static class SaveMetadata implements Serializable {
 
         private static final long serialVersionUID = 1L;
         public long     timestamp;
@@ -144,6 +146,7 @@ public class Doc {
             other.filename = filename;
             other.modified = modified;
             other.key = key.clone();
+            other.saveHistory = new ArrayList<Doc.SaveMetadata>(saveHistory);
         }
         
         public void setKey(String pwd) {
@@ -183,6 +186,41 @@ public class Doc {
 
     public String getVersion() {
         return String.format("v%d.%d", m_verFormat, m_verMinor);
+    }
+
+    public static String getInfoStr(Doc.DocMetadata docMetaData, DateFormat dataFormat) {
+        StringBuilder sb = new StringBuilder();
+
+        if (docMetaData != null && !TextUtils.isEmpty(docMetaData.filename)) {
+            Doc doc = new Doc();
+
+            try {
+                sb.append("\nFile: ").append(docMetaData.filename);
+                File file = new File(DocFileDlg.getDir(), docMetaData.filename);
+                sb.append("\nLastMod: ").append(dataFormat.format(file.lastModified()));
+                sb.append(String.format("\nLength: %,d", file.length()));
+                doc.doOpen(file, null);
+                sb.append("\nVersion: ").append(doc.getVersion());
+                if (!TextUtils.isEmpty(doc.getHint()))
+                    sb.append("\nHint: ").append(doc.getHint());
+
+                // Doc Meta not available unless you have password.
+                // Doc.DocMetadata docMetaData = doc.getDocMetadata();
+                // sb.append(Doc.getInfoStr(docMetaData, m_dateFormat));
+            } catch (Exception ex) {
+            }
+
+            if (docMetaData != null && docMetaData.saveHistory.size() != 0) {
+                sb.append("\nHistory: ");
+                for (Doc.SaveMetadata saveMetaData : docMetaData.saveHistory) {
+                    sb.append("\n ");
+                    sb.append(dataFormat.format(saveMetaData.timestamp));
+                    // sb.append(" ");
+                    // sb.append(saveMetaData.username);
+                }
+            }
+        }
+        return sb.toString();
     }
 
     /**
