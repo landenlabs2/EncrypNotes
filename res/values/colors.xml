@@ -7,4 +7,8 @@
     <!-- Round border -->
     <color name="round_border_color">#808080</color>
     <color name="round_bg_color">#c0c0c0</color>
+
+    <color name="round_border_color_act">#fff07700</color>
+    <color name="round_bg_color_act">#d0d0d0</color>
+
 </resources>

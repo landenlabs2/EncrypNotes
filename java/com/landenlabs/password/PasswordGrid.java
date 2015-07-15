@@ -1,9 +1,5 @@
 package com.landenlabs.password;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -30,6 +26,11 @@ import android.widget.GridLayout;
 import android.widget.TextView;
 
 import com.landenlabs.encrypnotes.R;
+import com.landenlabs.encrypnotes.ui.UiUtil;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Custom grid view to hold buttons to manage drawing a password pattern.
@@ -88,6 +89,7 @@ public class PasswordGrid extends GridLayout {
     public boolean onInterceptTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
         case MotionEvent.ACTION_DOWN:
+            UiUtil.hideSoftKeyboard(this);
             startDrag(null, new DragShadowBuilder(this) {
                 @Override
                 public void onDrawShadow(Canvas canvas) {

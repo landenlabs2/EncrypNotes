@@ -5,9 +5,12 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.ActionMode;
 import android.view.ContextThemeWrapper;
 import android.view.Menu;
@@ -63,12 +66,6 @@ public class DocFileDlg {
      * 
      * @param context
      *       UI context object (main activity)
-     * @param prefs
-     *       User preferences
-     * @param docMetadata
-     *       Document meta data
-     * @param docText
-     *       Document text (EditText ui object)
      */
     public DocFileDlg(Activity context) {
         m_context = context;
@@ -490,11 +487,25 @@ public class DocFileDlg {
         m_managePwd = new UiPasswordManager(prefs, dlg, false);
         this.m_managePwd.pwdHintLB.setVisibility(View.VISIBLE);
 
-        final EditText filenameETxt = (EditText) dlg.findViewById(R.id.save_filename);
+        final EditText filenameETxt = UiUtil.viewById(dlg, R.id.save_filename);
+
+        filenameETxt.addTextChangedListener(new TextWatcher() {
+
+            public void afterTextChanged(Editable s) {
+                setFilenameColor(filenameETxt);
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+        });
+
         if (!TextUtils.isEmpty(m_docMetadata.filename)) 
-            filenameETxt.setText(getName());
+            setFilename(filenameETxt, getName());
         
-        Button btn_browse = (Button) dlg.findViewById(R.id.file_browser);
+        Button btn_browse = UiUtil.viewById(dlg, R.id.file_browser);
         btn_browse.setVisibility(saveMode == SAVE ? View.GONE : View.VISIBLE);
         btn_browse.setOnClickListener(new Button.OnClickListener() {
 
@@ -505,7 +516,7 @@ public class DocFileDlg {
                         new SimpleFileDialog.SimpleFileDialogListener() {
                             @Override
                             public void onChosenDir(String chosenDir) {
-                                filenameETxt.setText(chosenDir.replaceAll(".*/", "").replace(DOC_EXT, ""));
+                                setFilename(filenameETxt, chosenDir);
                             }
                         });
 
@@ -515,7 +526,7 @@ public class DocFileDlg {
                 if (TextUtils.isEmpty(filename))
                     filename = "new" + DOC_EXT;
 
-                filenameETxt.setText(filename.replaceAll(".*/", "").replace(DOC_EXT, ""));
+                setFilename(filenameETxt, filename);
                 m_fileOpenDialog.DefaultFileName = new File(STORAGE_DIR, filename).getPath(); // "*"
                                                                                                // +
                                                                                                // DOC_EXT;
@@ -524,7 +535,7 @@ public class DocFileDlg {
             }
         });
 
-        Button btn_ok = (Button) dlg.findViewById(R.id.okBtn);
+        Button btn_ok = UiUtil.viewById(dlg, R.id.okBtn);
         btn_ok.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 String filename, pwd;
@@ -570,21 +581,16 @@ public class DocFileDlg {
         dlg.show();
     }
     
-    
-    /**
-     * Save current text encrypted into permanent file storage.
-     * 
-     * @param filename
-     *            save to filename else use <b>doc meta</b> filename.
-     * @param pwd
-     *            encrypt doc with password
-     * @param hint
-     *            password hint
-     * @param docText
-     * 
-     * Successful saving will be processed synchronously, failure will complete async.
-     * @return {@code true} if file saved and send message.
-     */
+    public void setFilename(final EditText editText, final String filename) {
+        editText.setText(filename.replaceAll(".*/", "").replace(DOC_EXT, ""));
+        setFilenameColor(editText);
+    }
+
+    public  void setFilenameColor(final EditText editText) {
+        File file = new File(STORAGE_DIR, editText.getText().toString() + DOC_EXT);
+        editText.setTextColor(file.exists() ? Color.RED : Color.BLACK);
+    }
+
     public boolean saveFile(String filename, String pwd, String hint, EditText docText, final SendMsg sendMsg) {
 
         if (!STORAGE_DIR.canWrite()) {

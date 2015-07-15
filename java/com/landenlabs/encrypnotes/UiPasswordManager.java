@@ -2,8 +2,10 @@ package com.landenlabs.encrypnotes;
 
 import android.app.Dialog;
 import android.text.InputType;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
+import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -20,7 +22,7 @@ import com.landenlabs.password.PasswordGrid.OnPasswordListener;
  * @author dlang_local
  * 
  */
-class UiPasswordManager implements OnFocusChangeListener {
+class UiPasswordManager implements OnFocusChangeListener, TextView.OnEditorActionListener {
     final EncrypPrefs m_prefs;
     
     final boolean openMode;
@@ -105,7 +107,10 @@ class UiPasswordManager implements OnFocusChangeListener {
         
         
         pwdText.setOnFocusChangeListener(this);
-        pwdVerify.setOnFocusChangeListener(this);
+        pwdText.setOnEditorActionListener(this);
+        // pwdVerify.setOnFocusChangeListener(this);
+        // pwdVerify.setOnEditorActionListener(this);
+        // pwdGrid.setOnFocusChangeListener(this);
     }
     
     public EditText getPwdView() {
@@ -128,10 +133,14 @@ class UiPasswordManager implements OnFocusChangeListener {
         int vis = m_prefs.ShowPat ? View.VISIBLE : View.GONE;
         pwdGrid.setVisibility(vis);
 
-        int otherVis = View.GONE;
-        if (!m_prefs.ShowPat && !openMode)
-            otherVis = m_prefs.ShowPwd ? View.GONE : View.VISIBLE;
+        boolean hide = m_prefs.ShowPat || openMode;
 
+        if (hide)
+            pwdText.setNextFocusDownId(R.id.okBtn);
+        else
+            pwdText.setNextFocusDownId(R.id.pwd_verify);
+
+        int otherVis =  hide ? View.GONE : View.VISIBLE;
         pwdVerify.setVisibility(otherVis);
         pwdVerifyLB.setVisibility(otherVis);
         pwdVerifyClear.setVisibility(otherVis);
@@ -143,15 +152,24 @@ class UiPasswordManager implements OnFocusChangeListener {
         // pwdText.setFocusable(!m_showPat);
     }
 
+    // =====
     @Override
     public void onFocusChange(View view, boolean hasFocus) {
-        if (!hasFocus) {
+        if (!hasFocus || !(view instanceof EditText)) {
             // if (view == null)
             //    view = getCurrentFocus();
             if (view != null)  
                 UiUtil.hideSoftKeyboard(view);
         }
     }
-    
-   
+
+    // =====
+    @Override
+    public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
+        if (actionId == EditorInfo.IME_ACTION_NEXT) {
+            UiUtil.hideSoftKeyboard(view);
+        }
+        return false;
+    }
+
 }
