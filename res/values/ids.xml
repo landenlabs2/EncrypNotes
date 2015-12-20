@@ -12,6 +12,7 @@
     <item name="pwd_verify_clear" type="id"/>
     <item name="pwd_hint_label" type="id"/>
     <item name="pwd_hint_value" type="id"/>
+    <item name='pwd_verify_holder' type='id' />
 
     <item name="file_browser" type="id" />
 
@@ -21,5 +22,6 @@
 
     <!-- dialogs -->
     <item name="dlg_title" type="id" />
+    <item name="dlg_desc" type="id" />
 
 </resources>

@@ -1,3 +1,26 @@
+/*
+ *  Copyright (c) 2015 Dennis Lang (LanDen Labs) landenlabs@gmail.com
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ *  associated documentation files (the "Software"), to deal in the Software without restriction, including
+ *  without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
+ *  following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+ *  LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+ *  NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ *  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ *  @author Dennis Lang  (Dec-2015)
+ *  @see http://landenlabs.com
+ *
+ */
+
 package com.landenlabs.encrypnotes;
 
 import android.app.Activity;
@@ -47,7 +70,8 @@ import com.landenlabs.encrypnotes.ui.YesNoDialog;
  *         <p>
  * @author Ivan Voras <br>
  *         WebSite: {@link http://sourceforge.net/projects/enotes/}
- * 
+ *
+ * @see http://landenlabs.com
  * @version 1.3
  * @since 2014-Nov-25
  */
@@ -386,6 +410,9 @@ public class EncrypNotes extends Activity implements DlgClickListener, OnSeekBar
     public void onBackPressed() {
         // super.onBackPressed();
         YesNoDialog.showDialog(this, "", "Exit ?", CLKMSG_EXIT, YesNoDialog.BTN_YES_NO);
+        // WebDialog.show(this, WebDialog.HTML_CENTER_BOX, "Exit ?");
+        // TODO - change to webdialog, make it nicer exit dialog.
+        // WebDialog.show(this, WebDialog.HTML_CENTER_BOX, "<h2>Exit ?</h2>");
     }
 
 // ========================================================================

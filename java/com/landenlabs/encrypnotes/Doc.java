@@ -1,4 +1,6 @@
-package com.landenlabs.encrypnotes;/*
+package com.landenlabs.encrypnotes;
+
+/*
  * (c) 2009.-2014. Ivan Voras <ivoras@fer.hr>
  * Released under the 2-clause BSDL.
  */

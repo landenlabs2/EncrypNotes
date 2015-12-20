@@ -19,6 +19,7 @@ import java.util.ArrayList;
  * provided a selectable file list.
  * 
  * @author Dennis Lang
+ * @see http://landenlabs.com
  *
  */
 public class FileListAdapter extends ArrayAdapter<String> implements View.OnClickListener,  View.OnLongClickListener  {
