@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="E:\Mobile\projects\AndroidStudioProjects\EncrypNotes14\app\src\main\assets"><file name="about.html" path="E:\Mobile\projects\AndroidStudioProjects\EncrypNotes14\app\src\main\assets\about.html"/><file name="test.html" path="E:\Mobile\projects\AndroidStudioProjects\EncrypNotes14\app\src\main\assets\test.html"/></source></dataSet><dataSet config="release"><source path="E:\Mobile\projects\AndroidStudioProjects\EncrypNotes14\app\src\release\assets"/></dataSet></merger>
