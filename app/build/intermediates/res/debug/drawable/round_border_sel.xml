@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item android:drawable="@drawable/round_border_act" android:state_focused="true"/>
-    <item android:drawable="@drawable/round_border"/>
-</selector><!-- From: file:/E:/Mobile/projects/AndroidStudioProjects/EncrypNotes14/app/src/main/res/drawable/round_border_sel.xml -->
