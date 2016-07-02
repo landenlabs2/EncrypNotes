@@ -24,11 +24,11 @@
 package com.landenlabs.encrypnotes;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnShowListener;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -37,18 +37,13 @@ import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.ActionMode;
 import android.view.ContextThemeWrapper;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
-import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.PopupMenu;
 
 import com.landenlabs.encrypnotes.ui.RenameDialog;
@@ -105,6 +100,7 @@ public class DocFileDlg {
     public boolean ensureDocDir() {
         // PermissionChecker.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
         int permissionCheck = ContextCompat.checkSelfPermission(m_context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             // OK permission granted, let's do stuff
             return (STORAGE_DIR.isDirectory() || STORAGE_DIR.mkdirs());
@@ -117,7 +113,7 @@ public class DocFileDlg {
     /**
      * @return storage directory.
      */
-    public static final File getDir() {
+    public static File getDir() {
         return STORAGE_DIR;
     }
     
@@ -188,7 +184,7 @@ public class DocFileDlg {
     }
 
     public void showInfo() {
-        String infosStr = Doc.getInfoStr(m_docMetadata, m_dateFormat);
+        String infosStr = Doc.getInfoStr(m_docMetadata, m_dateFormat).replace("\n", "<p>");
         // YesNoDialog.showDialog(m_context, "Info", infosStr,
         //         R.id.file_info, YesNoDialog.BTN_OK);
         String htmlStr = infosStr.replaceAll("\n([^:]*:)(.*)", "<tr><td><span style='color:blue;'>$1</span><td>$2");
@@ -255,6 +251,7 @@ public class DocFileDlg {
                 popup.getMenuInflater().inflate(R.menu.file_context_menu, popup.getMenu());
 
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @SuppressLint("DefaultLocale")
                     public boolean onMenuItemClick(MenuItem item) {
                         File file = fileListAdapter.getFile(filename);
 
@@ -295,54 +292,6 @@ public class DocFileDlg {
             }
         });
 
-        if (false) {
-            // Context menu not working - opens but click does not appear in
-            // menu or context listeners in main activity.
-            // ActionBar appears but is in background and darkened.
-            // ** See associated code in EncrypNotes [context_menu]
-            alert.requestWindowFeature(Window.FEATURE_ACTION_BAR);
-
-            alert.setOnShowListener(new OnShowListener() {
-                @Override
-                public void onShow(DialogInterface dialog) {
-                    final ListView listView = alert.getListView();
-                    listView.setTag(FILE_CONTEXT_MENU);
-                    m_context.registerForContextMenu(listView);
-
-
-                    listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-                        @Override
-                        public boolean onItemLongClick(AdapterView<?> parent, View view, int position,
-                                                       long id) {
-
-                            view.requestFocus();
-                            view.setSelected(true);
-                            listView.setSelection(position);
-                            listView.invalidateViews();
-                            //        m_context.openContextMenu(listView);
-                            m_context.startActionMode(new ActionMode.Callback() {
-                                public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                                    return false;
-                                }
-
-                                public void onDestroyActionMode(ActionMode mode) {
-                                    mode = null;
-                                }
-
-                                public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                                    return true;
-                                }
-
-                                public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                                    return false;
-                                }
-                            });
-                            return true;
-                        }
-                    });
-                }
-            });
-        }
 
         alert.show();
         // alert.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
@@ -410,6 +359,7 @@ public class DocFileDlg {
 
         Button btn_ok = (Button) dlg.findViewById(R.id.okBtn);
         btn_ok.setOnClickListener(new Button.OnClickListener() {
+            @SuppressLint("DefaultLocale")
             public void onClick(View v) {
                 EditText pwdText = (EditText) dlg.findViewById(R.id.pwd);
                 String pwd = pwdText.getText().toString();

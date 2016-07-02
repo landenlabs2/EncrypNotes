@@ -2,12 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.landenlabs.encrypnotes"
     android:installLocation="auto"
-    android:versionCode="1400"
-    android:versionName="1.4" >
+    android:versionCode="1600"
+    android:versionName="1.6" >
 
+    <!--
     <uses-sdk
         android:minSdkVersion="15"
-        android:targetSdkVersion="19" />
+        android:targetSdkVersion="23" />
+    -->
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -25,12 +27,17 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        	<intent-filter>
-        	    <!--  experimental file browser -->
-            	<action android:name="android.intent.action.GET_CONTENT" />
-            	<category android:name="android.intent.category.DEFAULT" />
         	</intent-filter>
+
+            <intent-filter android:label="@string/app_title">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
+                <data android:scheme="http"
+                    android:host="www.landenlabs.com"
+                    android:pathPrefix="/android/encrypnotes" />
+            </intent-filter>
         </activity>
     </application>
 

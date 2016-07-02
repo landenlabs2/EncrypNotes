@@ -11,7 +11,7 @@ WebPage
 
 Encryp Notes is an encrypted notepad based off of code provided by [Ivan Voras (enotes)](http://sourceforge.net/projects/enotes/).
 
-Screen sample of EncryptNotes
+Screen sample of EncrypNotes
 
 ![Screen](http://landenlabs.com/android/encrypnotes/main-menu.png)
 

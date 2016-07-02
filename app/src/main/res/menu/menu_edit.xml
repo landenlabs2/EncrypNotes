@@ -3,7 +3,7 @@
 
     <item
         android:icon="@android:drawable/ic_menu_edit"
-        android:showAsAction="always"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_edit">
         <menu>
             <item
@@ -39,7 +39,7 @@
         android:id="@+id/menu_more"
         android:icon="@drawable/ic_more"
         android:title="@string/menu_title_main"
-        android:showAsAction="always">
+        android:showAsAction="ifRoom">
         <menu>
             <item
                 android:id="@+id/menu_new"

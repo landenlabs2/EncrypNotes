@@ -36,6 +36,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -301,7 +302,12 @@ public class PasswordGrid extends GridLayout {
             Bitmap rotImage = rotateImage(m_onImage, (hitCnt-1) * 30);
             Drawable rotDraw = new BitmapDrawable(getResources(), rotImage);
 
-            childHit.setBackground(rotDraw);
+            if (Build.VERSION.SDK_INT < 16) {
+                //noinspection deprecation,deprecation
+                childHit.setBackgroundDrawable(new BitmapDrawable(rotImage));
+            } else {
+                childHit.setBackground(rotDraw);
+            }
         } else {
             childHit.setBackgroundResource(m_offId);
         }
@@ -337,8 +343,13 @@ public class PasswordGrid extends GridLayout {
         if (hitCnt > 0) {
             Bitmap rotImage = rotateImage(m_onImage, hitCnt * 30);
             Drawable rotDraw = new BitmapDrawable(getResources(), rotImage);
-            
-            childHit.setBackground(rotDraw);
+
+            if (Build.VERSION.SDK_INT < 16) {
+                //noinspection deprecation,deprecation
+                childHit.setBackgroundDrawable(new BitmapDrawable(rotImage));
+            } else {
+                childHit.setBackground(rotDraw);
+            }
         } else {
             childHit.setBackgroundResource(m_onId);
         }

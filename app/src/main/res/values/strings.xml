@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Encryp Notes</string>
-    <string name="app_desc">Encrypted Notepad\nby Dennis Lang</string>
+    <string name="app_desc">EncrypNotes\nEncrypted Notepad\nBy Dennis Lang</string>
     <string name="app_title">%1$s    [%2$d char]</string>
         
     <string name="menu_about">About…</string>
@@ -30,12 +30,16 @@
     <string name="new_document">new</string>
     <string name="no_etxt_files">There are no *%1$s files in "%2$s"</string>
     <string name="list_etxt_files">*%1$s files in "%2$s"</string>
-    
+
+    <!--
     <string name="ask_filename">Save File:</string>
+    <string name="open_file"> Open File:</string>
+    -->
+
     <string name="notify_mydocs">Document will be saved in "%1$s" directory on SD card.</string>
     <string name="dlg_save_title">Save Encrypted</string>
     <string name="dlg_open_title">Open Encrypted</string>
-    <string name="open_file"> Open File:</string>
+
     <string name="invalid_filename">Invalid filename!</string>
     
     <string name="pwd_enter">Password:</string>
@@ -44,12 +48,10 @@
     <string name="pwd_empty">The password cannot be empty!</string>
     <string name="pwd_pattern">Pattern</string>
     <string name="pwd_showpat">Show</string>
-    <string name="pwd_x">x</string>
     <string name="pwd_hint">Password Hint</string>
     <string name="hintLbl">Hint:</string>
     
     <string name="file_saved">File saved as &quot;%s&quot;</string>
     <string name="global_pwd_text">Enable single global password!</string>
-    <string name="cb_paranoid">Be (more) paranoid about displaying text after app inactivity</string>
     <string name="dlg_prefs_title">Options</string>
 </resources>

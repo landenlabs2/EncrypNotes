@@ -31,6 +31,7 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:editable="false"
+            android:inputType="text"
             android:focusable="false"
             android:textColor="@android:color/white"
             android:textSize="@dimen/Normal16" />

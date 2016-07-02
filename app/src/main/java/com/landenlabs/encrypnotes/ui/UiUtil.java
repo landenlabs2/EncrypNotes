@@ -1,3 +1,26 @@
+/*
+ *  Copyright (c) 2015 Dennis Lang (LanDen Labs) landenlabs@gmail.com
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ *  associated documentation files (the "Software"), to deal in the Software without restriction, including
+ *  without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
+ *  following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in all copies or substantial
+ *  portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+ *  LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+ *  NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ *  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ *  @author Dennis Lang  (Dec-2015)
+ *  @see http://landenlabs.com
+ *
+ */
+
 package com.landenlabs.encrypnotes.ui;
 
 import android.app.Activity;
@@ -15,14 +38,21 @@ import android.widget.EditText;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * UI Utility functions.
+ *
+ * @author Dennis Lang
+ * @see http://landenlabs.com
+ *
+ */
 public class UiUtil {
 
     @SuppressWarnings("unchecked")
-    public static final <E extends View> E viewById(View rootView, int id) {
+    public static <E extends View> E viewById(View rootView, int id) {
         return (E) rootView.findViewById(id);
     }
     @SuppressWarnings("unchecked")
-    public static final <E extends View> E viewById(Dialog rootDialog, int id) {
+    public static <E extends View> E viewById(Dialog rootDialog, int id) {
         return (E) rootDialog.findViewById(id);
     }
 

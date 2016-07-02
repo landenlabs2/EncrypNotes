@@ -51,6 +51,7 @@ package com.landenlabs.encrypnotes;
 *   @see http://landenlabs.com
 */
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -114,7 +115,7 @@ public class SimpleFileDialog {
     
     // Callback interface for selected directory
     public interface SimpleFileDialogListener {
-        public void onChosenDir(String chosenDir);
+        void onChosenDir(String chosenDir);
     }
 
     // Constructor for File/Dir selection dialog.
@@ -287,6 +288,7 @@ public class SimpleFileDialog {
         // Need to make this a variable Save as, Open, Select Directory
         m_titleView1.setGravity(Gravity.CENTER_VERTICAL);
         m_titleView1.setBackgroundColor(DARK_GRAY);
+        //noinspection deprecation
         m_titleView1.setTextColor(m_context.getResources().getColor(android.R.color.white));
 
         // Create custom view for AlertDialog title
@@ -336,6 +338,7 @@ public class SimpleFileDialog {
         m_titleView = new TextView(m_context);
         m_titleView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         m_titleView.setBackgroundColor(DARK_GRAY);
+        //noinspection deprecation
         m_titleView.setTextColor(m_context.getResources().getColor(android.R.color.white));
         m_titleView.setGravity(Gravity.CENTER_VERTICAL);
         m_titleView.setText(title);
@@ -370,6 +373,7 @@ public class SimpleFileDialog {
 
     private ArrayAdapter<String> createListAdapter(List<String> items) {
         return new ArrayAdapter<String>(m_context, R.layout.file_list_row, R.id.fl_name, items) {
+            @SuppressLint("DefaultLocale")
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View itemView = super.getView(position, convertView, parent);

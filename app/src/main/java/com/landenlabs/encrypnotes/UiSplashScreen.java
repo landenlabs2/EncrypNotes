@@ -30,6 +30,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+/**
+ * Show Large application image and fade out.
+ *
+ * @author Dennis Lang
+ * @see http://landenlabs.com
+ */
 public class UiSplashScreen {
     
     final Activity m_context;
@@ -84,5 +90,4 @@ public class UiSplashScreen {
             m_splashTxt = null;
         }
     }
-  
 }
