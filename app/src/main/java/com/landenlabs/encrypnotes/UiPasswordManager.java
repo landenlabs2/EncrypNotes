@@ -24,10 +24,14 @@
 package com.landenlabs.encrypnotes;
 
 import android.app.Dialog;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -46,15 +50,22 @@ import com.landenlabs.password.PasswordGrid.OnPasswordListener;
  * @see http://landenlabs.com
  * 
  */
-class UiPasswordManager implements OnFocusChangeListener, TextView.OnEditorActionListener {
+class UiPasswordManager
+        implements OnFocusChangeListener
+        , TextView.OnEditorActionListener
+        , TextWatcher
+        , CompoundButton.OnCheckedChangeListener
+        , View.OnClickListener {
+
     final EncrypPrefs m_prefs;
     
     final boolean openMode;
+    final ViewGroup pwdHolder;
     final EditText pwdText;
-    final View pwdClear;
+    final ViewGroup pwdVerifyHolder;
     final EditText pwdVerify;
-    final TextView pwdVerifyLB;
-    final View pwdVerifyClear;
+    // final TextView pwdVerifyLB;
+    // final View pwdVerifyClear;
     final PasswordGrid pwdGrid;
     final CheckBox patternCb;
     final CheckBox showCb;
@@ -66,11 +77,18 @@ class UiPasswordManager implements OnFocusChangeListener, TextView.OnEditorActio
         m_prefs = prefs;
         
         this.openMode = openMode;
+
+        pwdHolder = UiUtil.viewById(dlg, R.id.pwd_holder);
         pwdText = UiUtil.viewById(dlg, R.id.pwd);
-        pwdClear = UiUtil.viewById(dlg, R.id.pwd_clear);
+        UiUtil.viewById(dlg, R.id.pwd_clear).setOnClickListener(this);
+        UiUtil.viewById(dlg, R.id.pwd_del).setOnClickListener(this);
+
+        pwdVerifyHolder = UiUtil.viewById(dlg, R.id.pwd_verify_holder);
         pwdVerify = UiUtil.viewById(dlg, R.id.pwd_verify);
-        pwdVerifyLB = UiUtil.viewById(dlg, R.id.pwd_verifyLB);
-        pwdVerifyClear = UiUtil.viewById(dlg, R.id.pwd_verify_clear);
+        // pwdVerifyLB = UiUtil.viewById(dlg, R.id.pwd_verifyLB);
+        UiUtil.viewById(dlg, R.id.pwd_verify_clear).setOnClickListener(this);
+        UiUtil.viewById(dlg, R.id.pwd_verify_del).setOnClickListener(this);
+
         pwdGrid = UiUtil.viewById(dlg, R.id.pwd_grid);
         patternCb = UiUtil.viewById(dlg, R.id.pwd_patternCB);
         showCb = UiUtil.viewById(dlg, R.id.pwd_showCB);
@@ -83,39 +101,8 @@ class UiPasswordManager implements OnFocusChangeListener, TextView.OnEditorActio
         patternCb.setChecked(m_prefs.ShowPat);
         showCb.setChecked(m_prefs.ShowPwd);
 
-        patternCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                m_prefs.ShowPat = isChecked;
-                update();
-            }
-        });
-
-        showCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                m_prefs.ShowPwd = isChecked;
-                update();
-            }
-        });
-
-        pwdClear.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                pwdText.setText("");
-                pwdGrid.clear();
-            }
-        });
-
-        pwdVerifyClear.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                pwdVerify.setText("");
-            }
-        });
+        patternCb.setOnCheckedChangeListener(this);
+        showCb.setOnCheckedChangeListener(this);
 
         pwdGrid.setListener(new OnPasswordListener() {
 
@@ -125,13 +112,17 @@ class UiPasswordManager implements OnFocusChangeListener, TextView.OnEditorActio
 
             @Override
             public void onPasswordChanged(String s) {
-                pwdText.setText(s);
+                if (!s.equals(pwdText.getText().toString())) {
+                    pwdText.setText(s);
+                }
             }
         });
         
         
         pwdText.setOnFocusChangeListener(this);
         pwdText.setOnEditorActionListener(this);
+        pwdText.addTextChangedListener(this);
+
         // pwdVerify.setOnFocusChangeListener(this);
         // pwdVerify.setOnEditorActionListener(this);
         // pwdGrid.setOnFocusChangeListener(this);
@@ -165,9 +156,10 @@ class UiPasswordManager implements OnFocusChangeListener, TextView.OnEditorActio
             pwdText.setNextFocusDownId(R.id.pwd_verify);
 
         int otherVis =  hide ? View.GONE : View.VISIBLE;
-        pwdVerify.setVisibility(otherVis);
-        pwdVerifyLB.setVisibility(otherVis);
-        pwdVerifyClear.setVisibility(otherVis);
+        pwdVerifyHolder.setVisibility(otherVis);
+        // pwdVerify.setVisibility(otherVis);
+        // pwdVerifyLB.setVisibility(otherVis);
+        // pwdVerifyClear.setVisibility(otherVis);
 
         pwdText.setInputType(InputType.TYPE_CLASS_TEXT
                 | (m_prefs.ShowPwd ? InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
@@ -190,10 +182,72 @@ class UiPasswordManager implements OnFocusChangeListener, TextView.OnEditorActio
     // =====
     @Override
     public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
-        if (actionId == EditorInfo.IME_ACTION_NEXT) {
+        if (actionId == EditorInfo.IME_ACTION_NEXT
+                || actionId == EditorInfo.IME_ACTION_DONE) {
             UiUtil.hideSoftKeyboard(view);
         }
         return false;
     }
 
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        int id = buttonView.getId();
+        switch (id) {
+            case R.id.pwd_patternCB:
+                m_prefs.ShowPat = isChecked;
+                update();
+                break;
+            case R.id.pwd_showCB:
+                m_prefs.ShowPwd = isChecked;
+                update();
+                break;
+        }
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        if (!s.equals(pwdGrid.getPassword())) {
+            pwdGrid.setPassword(s.toString(), false);
+        }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+    }
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        String str;
+        switch (id) {
+            case R.id.pwd_clear:
+                pwdText.setText("");
+                pwdGrid.clear();
+                break;
+            case R.id.pwd_del:
+                pwdGrid.deletePoint(-1);
+                /*
+                str = pwdText.getText().toString();
+                if (!TextUtils.isEmpty(str)) {
+                    pwdText.setText(str.substring(0, str.length() - 1));
+                }
+                */
+                break;
+
+            case R.id.pwd_verify_clear:
+                pwdVerify.setText("");
+                break;
+
+            case R.id.pwd_verify_del:
+                str = pwdVerify.getText().toString();
+                if (!TextUtils.isEmpty(str)) {
+                    pwdVerify.setText(str.substring(0, str.length() - 1));
+                }
+                break;
+        }
+    }
 }

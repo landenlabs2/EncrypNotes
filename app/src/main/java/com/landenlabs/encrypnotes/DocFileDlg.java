@@ -23,14 +23,17 @@
 
 package com.landenlabs.encrypnotes;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -100,7 +103,15 @@ public class DocFileDlg {
      * @return
      */
     public boolean ensureDocDir() {
-        return (STORAGE_DIR.isDirectory() || STORAGE_DIR.mkdir());
+        // PermissionChecker.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        int permissionCheck = ContextCompat.checkSelfPermission(m_context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            // OK permission granted, let's do stuff
+            return (STORAGE_DIR.isDirectory() || STORAGE_DIR.mkdirs());
+        }
+
+        // Need to ask for permission
+        return false;
     }
 
     /**
@@ -418,7 +429,9 @@ public class DocFileDlg {
                     return;
                 } catch (Exception e) {
                     String exName = e.getClass().getName().replaceAll(".*\\.", "");
-                    String exMsg = e.getMessage().replaceAll(".*\\(", "(");
+                    String exMsg = e.getMessage();
+                    if (!TextUtils.isEmpty(exMsg))
+                        exMsg = exMsg.replaceAll(".*\\(", "(");
                     YesNoDialog.showOk(m_context, exName + "\n File: " + filename + "\n\n" + exMsg);
                     WebDialog.show(m_context, WebDialog.HTML_CENTER_BOX, 
                             String.format("<center><h2>%s</h2><table frame='box'><tr><td>File:<td>%s</table><p>%s",  
@@ -615,6 +628,21 @@ public class DocFileDlg {
         editText.setTextColor(file.exists() ? Color.RED : Color.BLACK);
     }
 
+
+    /**
+     * Save current text encrypted into permanent file storage.
+     *
+     * @param filename
+     *            save to filename else use <b>doc meta</b> filename.
+     * @param pwd
+     *            encrypt doc with password
+     * @param hint
+     *            password hint
+     * @param docText
+     *
+     * Successful saving will be processed synchronously, failure will complete async.
+     * @return {@code true} if file saved and send message.
+     */
     public boolean saveFile(String filename, String pwd, String hint, EditText docText, final SendMsg sendMsg) {
 
         if (!STORAGE_DIR.canWrite()) {
@@ -637,6 +665,11 @@ public class DocFileDlg {
         // Use new password if provided
         if (!TextUtils.isEmpty(pwd))
             m_docMetadata.setKey(pwd);
+
+        if (hint == null)
+            hint = m_docMetadata.hint;
+        else
+            m_docMetadata.hint = hint;
 
         Doc doc = new Doc(docText.getText().toString(), m_docMetadata);
 

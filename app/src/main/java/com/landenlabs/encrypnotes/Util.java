@@ -5,6 +5,8 @@ package com.landenlabs.encrypnotes;
  * Released under the 2-clause BSDL.
  */
 
+import android.util.Log;
+
 import com.landenlabs.encrypnotes.ui.LogIt;
 
 import java.io.File;
@@ -12,6 +14,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 
 /**
  * @author ivoras
@@ -19,12 +22,12 @@ import java.sql.Date;
 public class Util {
 
     /**
-     * @return  Current date.
+     * @return Current date.
      */
     public static Date getCurrentDate() {
         return new Date(System.currentTimeMillis());
     }
-    
+
     /**
      * @param filename
      * @return {@code true} if file exists.
@@ -33,7 +36,7 @@ public class Util {
         return new File(filename).exists();
     }
 
-    
+
     /**
      * Returns a binary MD5 hash of the given string.
      *
@@ -144,5 +147,36 @@ public class Util {
         System.arraycopy(src1, 0, dst, 0, src1.length);
         System.arraycopy(src2, 0, dst, src1.length, src2.length);
         return dst;
+    }
+
+    public static class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
+
+        private static final String APP_VERSION_INFO_ID_FORMAT = "%s; version info";
+        private static final String ERROR_REPORT_FORMAT = "yyyy.MM.dd HH:mm:ss z";
+        private SimpleDateFormat format = new SimpleDateFormat(ERROR_REPORT_FORMAT);
+
+        private Thread.UncaughtExceptionHandler originalHandler;
+
+        /**
+         * Creates a reporter instance
+         *
+         * @throws NullPointerException if the parameter is null
+         */
+        public UncaughtExceptionHandler() throws NullPointerException {
+            originalHandler = Thread.getDefaultUncaughtExceptionHandler();
+        }
+
+        @Override
+        public void uncaughtException(Thread thread, Throwable ex) {
+
+            String stackTrace = Log.getStackTraceString(ex);
+            Log.d("UncaughtException", stackTrace);
+            Log.e("UncaughtException", ex.getLocalizedMessage(), ex);
+
+            if (originalHandler != null) {
+                originalHandler.uncaughtException(thread, ex);
+            }
+        }
+
     }
 }

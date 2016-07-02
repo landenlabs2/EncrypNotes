@@ -121,12 +121,14 @@ public class Doc {
         public ArrayList<Doc.SaveMetadata> saveHistory = new ArrayList<Doc.SaveMetadata>();
         public boolean modified = false;
         public String filename;
+        public String hint;
         public int caretPosition;
         public byte[] key;
 
         void saveMetadata(DataOutputStream oStrm) throws IOException {
             oStrm.writeInt(caretPosition);
             oStrm.writeUTF(filename);
+            oStrm.writeUTF(hint);
             oStrm.writeInt(saveHistory.size());
             for (SaveMetadata sm : saveHistory) {
                 oStrm.writeLong(sm.timestamp);
@@ -137,6 +139,7 @@ public class Doc {
         void loadMetadata(DataInputStream iStrm, int minVer) throws IOException {
             caretPosition = iStrm.readInt();
             filename = iStrm.readUTF();
+            hint = iStrm.readUTF();
             int nSave = iStrm.readInt();
             saveHistory = new ArrayList<SaveMetadata>(nSave+1);
             for (int idx = 0; idx < nSave; idx++)
@@ -146,6 +149,7 @@ public class Doc {
         void copyTo(DocMetadata other) {
             other.caretPosition = caretPosition;
             other.filename = filename;
+            other.hint = hint;
             other.modified = modified;
             other.key = key.clone();
             other.saveHistory = new ArrayList<Doc.SaveMetadata>(saveHistory);
@@ -428,6 +432,7 @@ public class Doc {
         // fin.close();
 
         newdocm.filename = fOpen.getAbsolutePath();
+        newdocm.hint = m_hint;
         m_docMeta = newdocm;
         m_text = newtext;
 

@@ -4,16 +4,17 @@ android {
         config {
             keyAlias 'landenlabs'
             keyPassword 'Salem2nh-k'
-            storeFile file('E:/Mobile/projects/landenlabs/landenlabs-release.keystore')
+            // storeFile file('E:/Mobile/projects/landenlabs/landenlabs-release.keystore')
+            // storeFile file('/Users/ldennis/Dropbox/android/keystores/landenlabs-release.keystore')
             storePassword 'Salem2nh-k'
         }
     }
-    compileSdkVersion 19
-    buildToolsVersion "20.0.0"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
     defaultConfig {
         applicationId "com.landenlabs.encrypnotes"
         minSdkVersion 15
-        targetSdkVersion 19
+        targetSdkVersion 23
         versionCode 1600
         versionName '1.6'
     }
@@ -33,6 +34,7 @@ android {
 }
 
 dependencies {
+    compile 'com.android.support:support-v4:23.0.0'
 }
 
 

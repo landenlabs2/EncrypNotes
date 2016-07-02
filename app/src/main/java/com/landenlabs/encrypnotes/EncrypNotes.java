@@ -40,7 +40,6 @@ import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -55,6 +54,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 
 import com.landenlabs.encrypnotes.ui.DlgClickListener;
+import com.landenlabs.encrypnotes.ui.Email;
 import com.landenlabs.encrypnotes.ui.LogIt;
 import com.landenlabs.encrypnotes.ui.RenameDialog;
 import com.landenlabs.encrypnotes.ui.SliderDialog;
@@ -137,6 +137,8 @@ public class EncrypNotes extends Activity implements DlgClickListener, OnSeekBar
         
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        new Util.UncaughtExceptionHandler();
         
         m_mainText = (EditText) this.findViewById(R.id.main_text);
         m_mainTextSize = m_mainText.getTextSize();
@@ -267,6 +269,14 @@ public class EncrypNotes extends Activity implements DlgClickListener, OnSeekBar
             saveFileUI(DocFileDlg.SAVE_AS);
             return true;
 
+        case R.id.menu_email:
+            if (m_mainText.getText().length() == 0) {
+                WebDialog.show(this, WebDialog.HTML_CENTER_BOX, "<h2>Nothing to save</h2>");
+                return false;
+            }
+            Email.send(this, "to@gmail.com", "EncrypNotes", m_mainText.getText().toString());
+            return true;
+
         case R.id.menu_about:
             m_splashScreen.show();
             aboutBox();
@@ -356,6 +366,11 @@ public class EncrypNotes extends Activity implements DlgClickListener, OnSeekBar
         return false;
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        new Util.UncaughtExceptionHandler();
+    }
 
     public void onStop() {
         saveIfNeeded();
@@ -383,7 +398,6 @@ public class EncrypNotes extends Activity implements DlgClickListener, OnSeekBar
      */
     @Override
     public void onSaveInstanceState(Bundle bundle) {
-        Log.d("foo", "onSaveInstanceState");
         m_prefs.save();
         if (!m_prefs.Paranoid) {
             m_docFileDialog.saveInstanceState(bundle, m_mainText);
@@ -409,7 +423,8 @@ public class EncrypNotes extends Activity implements DlgClickListener, OnSeekBar
     @Override
     public void onBackPressed() {
         // super.onBackPressed();
-        YesNoDialog.showDialog(this, "", "Exit ?", CLKMSG_EXIT, YesNoDialog.BTN_YES_NO);
+        String exitMsg = m_docFileDialog.isModified() ? "Exit without saving ?" : "Exit ?";
+        YesNoDialog.showDialog(this, "", exitMsg, CLKMSG_EXIT, YesNoDialog.BTN_YES_NO);
         // WebDialog.show(this, WebDialog.HTML_CENTER_BOX, "Exit ?");
         // TODO - change to webdialog, make it nicer exit dialog.
         // WebDialog.show(this, WebDialog.HTML_CENTER_BOX, "<h2>Exit ?</h2>");
@@ -599,7 +614,8 @@ public class EncrypNotes extends Activity implements DlgClickListener, OnSeekBar
     private void ensureDocDir() {
         if (m_docFileDialog.ensureDocDir())
             return;
-        YesNoDialog.showOk(this, "Cannot make  " + m_docFileDialog.getDir().getName(), CLKMSG_EXIT);
+        YesNoDialog.showOk(this, "Cannot make directory " + m_docFileDialog.getDir().getName()
+                + "\nEnable write permissions.", CLKMSG_EXIT);
     }
 
     /**

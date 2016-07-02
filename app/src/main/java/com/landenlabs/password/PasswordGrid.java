@@ -123,7 +123,7 @@ public class PasswordGrid extends GridLayout {
         case MotionEvent.ACTION_UP:
             View childHit = findChildAt(event.getX(), event.getY());
             if (childHit != null) {
-                addPoint(childHit);
+                addPoint(childHit, true);
             }
             break;
         }
@@ -135,11 +135,12 @@ public class PasswordGrid extends GridLayout {
     @Override
     public boolean onDragEvent(DragEvent event) {
 
-        if (event.getAction() == DragEvent.ACTION_DRAG_LOCATION) {
+        if (event.getAction() == DragEvent.ACTION_DRAG_LOCATION
+            || event.getAction() == DragEvent.ACTION_DROP) {
             View childHit = findChildAt(event.getX(), event.getY());
 
             if (childHit != m_lastView && childHit != null) {
-                addPoint(childHit);
+                addPoint(childHit, true);
 
             } else if (childHit == m_lastView) {
                 if (SystemClock.uptimeMillis() - m_pressMillis > 2000) {
@@ -239,6 +240,22 @@ public class PasswordGrid extends GridLayout {
         }
     }
 
+    public String getPassword() {
+        return m_password.toString();
+    }
+
+    public void setPassword(String newPwd, boolean fireListener) {
+        if (!m_password.equals(newPwd)) {
+            clear();
+            for (char c : newPwd.toCharArray()) {
+                View child = findChildFor("" + c);
+                if (child != null) {
+                    addPoint(child, fireListener);
+                }
+            }
+        }
+    }
+
      /**
      * Clear password and reset grid buttons to off state.
      */
@@ -259,12 +276,60 @@ public class PasswordGrid extends GridLayout {
         invalidate();
     }
 
+    public int size() {
+        return m_points.size();
+    }
+
+    public void deletePoint(int idx) {
+        if (m_points.size() == 0)
+            return;
+
+        if (idx == -1 || idx >= m_points.size()) {
+            idx = m_points.size() -1;
+        }
+
+        Point pt = m_points.get(idx);
+        View childHit = findChildAt(pt.x, pt.y);
+
+        Integer hitCntObj = m_buttonCnt.get(childHit);
+        if (hitCntObj == null)
+            return;
+
+        int hitCnt = hitCntObj.intValue() -1;
+        m_buttonCnt.put(childHit, hitCnt);
+        if (hitCnt > 0) {
+            Bitmap rotImage = rotateImage(m_onImage, (hitCnt-1) * 30);
+            Drawable rotDraw = new BitmapDrawable(getResources(), rotImage);
+
+            childHit.setBackground(rotDraw);
+        } else {
+            childHit.setBackgroundResource(m_offId);
+        }
+
+
+        m_points.remove(idx);
+        m_password.delete(idx, idx+1);
+        invalidate();
+
+        if (mListener != null) {
+            mListener.onPasswordChanged(m_password.toString());
+        }
+        childHit.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+
+        if (idx <= 0) {
+            m_lastView = null;
+        } else {
+            pt = m_points.get(idx-1);
+            m_lastView = findChildAt(pt.x, pt.y);
+        }
+    }
+
     /**
      * Add button child to sequence of password presses.
      * 
      * @param childHit
      */
-    public void addPoint(View childHit) {
+    public void addPoint(View childHit, boolean fireListener) {
 
         Integer hitCntObj = m_buttonCnt.get(childHit);
         int hitCnt = (hitCntObj==null) ? 0 : hitCntObj.intValue();
@@ -286,7 +351,7 @@ public class PasswordGrid extends GridLayout {
         m_password.append(getPasswordText(childHit));
         invalidate();
 
-        if (mListener != null) {
+        if (mListener != null && fireListener) {
             mListener.onPasswordChanged(m_password.toString());
         }
         childHit.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
@@ -425,6 +490,19 @@ public class PasswordGrid extends GridLayout {
 
             if (rectRP.contains((int) xRP, (int) yRP) && isPasswordView(childView))
                 return childView;
+        }
+
+        return null;
+    }
+
+    private View findChildFor(String str) {
+        for (int idx = 0; idx < getChildCount(); idx++) {
+            View childView = getChildAt(idx);
+            if (childView instanceof  TextView) {
+                TextView textView = (TextView)childView;
+                if (textView.getText().toString().equals(str))
+                    return childView;
+            }
         }
 
         return null;

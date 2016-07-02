@@ -57,6 +57,12 @@
                 android:id="@+id/menu_save_as"
                 android:icon="@android:drawable/ic_menu_save"
                 android:title="@string/menu_save_as"/>
+
+            <item
+                android:id="@+id/menu_email"
+                android:icon="@android:drawable/ic_dialog_email"
+                android:title="@string/menu_email"/>
+
             <item
                 android:id="@+id/menu_about"
                 android:icon="@drawable/ic_menu_info_details"
