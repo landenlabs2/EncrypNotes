@@ -128,22 +128,26 @@ public class Doc {
         void saveMetadata(DataOutputStream oStrm) throws IOException {
             oStrm.writeInt(caretPosition);
             oStrm.writeUTF(filename);
-            oStrm.writeUTF(hint);
+
             oStrm.writeInt(saveHistory.size());
             for (SaveMetadata sm : saveHistory) {
                 oStrm.writeLong(sm.timestamp);
                 oStrm.writeUTF(sm.username);
             }
+
+            // oStrm.writeUTF(hint);
         }
 
         void loadMetadata(DataInputStream iStrm, int minVer) throws IOException {
             caretPosition = iStrm.readInt();
             filename = iStrm.readUTF();
-            hint = iStrm.readUTF();
+
             int nSave = iStrm.readInt();
             saveHistory = new ArrayList<SaveMetadata>(nSave+1);
             for (int idx = 0; idx < nSave; idx++)
                 saveHistory.add(new Doc.SaveMetadata(iStrm.readLong(), iStrm.readUTF()));
+
+            // hint = iStrm.readUTF();
         }
 
         void copyTo(DocMetadata other) {
