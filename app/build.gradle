@@ -2,11 +2,11 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         config {
-            keyAlias 'landenlabs'
-            keyPassword 'Salem2nh-k'
+            keyAlias 'xxxx'
+            keyPassword 'xxxx'
             // storeFile file('E:/Mobile/projects/landenlabs/landenlabs-release.keystore')
-            // storeFile file('/Users/ldennis/Dropbox/android/keystores/landenlabs-release.keystore')
-            storePassword 'Salem2nh-k'
+            storeFile file('/Users/ldennis/Dropbox/android/keystores/encrypNotes.jks')
+            storePassword 'xxxx'
         }
     }
     compileSdkVersion 23
